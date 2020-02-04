@@ -1,3 +1,3 @@
 # Sentiment Analyser
 Uses the twitter api to provide a sentiment for keywords entered by user\
-Heroku Link for GUI Version: 
+Heroku Link for GUI Version: https://sentiment-analyser-boredsid.herokuapp.com/

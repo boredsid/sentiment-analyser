@@ -1,4 +1,5 @@
 import dash
+import os
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
@@ -7,6 +8,9 @@ import pySentiment
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+server = app.server
+server.secret_key = os.environ.get('secret_key', 'secret')
 
 app.layout = html.Div(children=[
     html.H1(children='Sentiment Analyser'),
@@ -53,4 +57,4 @@ def update_tweet_data(n_clicks,search_term,table):
     return table,top_tweets
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
