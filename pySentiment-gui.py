@@ -45,14 +45,16 @@ def update_tweet_data(n_clicks,search_term,table):
     if n_clicks!=0:
         subs = [table[i]['props']['children'][1]['props']['children'] for i in range(len(table))]
         new_data = pySentiment.TweetAnalyse(search_term)
+        posShare = str(round(new_data[1]*100,2)) + "%"
+        negShare = str(round(new_data[2]*100,2)) + "%"
         if search_term in subs:
             pos = subs.index(search_term)
-            table[pos]['props']['children'][2]['props']['children'] = new_data[1]
-            table[pos]['props']['children'][3]['props']['children'] = new_data[2]
+            table[pos]['props']['children'][2]['props']['children'] = posShare
+            table[pos]['props']['children'][3]['props']['children'] = negShare
             table[pos]['props']['children'][4]['props']['children'] = new_data[0]
         else:
             count += 1
-            table = table + [html.Tr([html.Td(x) for x in [count,search_term,new_data[1],new_data[2],new_data[0]]])]
+            table = table + [html.Tr([html.Td(x) for x in [count,search_term,posShare,negShare,new_data[0]]])]
         top_tweets = [html.H3('Top Tweets for '+search_term+':')] + [html.P(x['text']) for x in new_data[3]] + [html.P(x['text']) for x in new_data[4]]
     return table,top_tweets
 
