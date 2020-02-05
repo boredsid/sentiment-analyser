@@ -3,6 +3,8 @@ import os
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+import dash_table
+import pandas as pd
 import pySentiment
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -25,38 +27,35 @@ app.layout = html.Div(children=[
 
     html.Table([html.Tr([
 
-    html.Td(html.Table(id='tweet-data',children=[html.Tr([html.Th(col) for col in ['Serial No.','Subject','Positive','Negative','# Tweets']])])),
+    html.Td(dash_table.DataTable(id='tweet-data',columns=[{'name':col,'id':col} for col in ['Serial No.','Subject','Positive','Negative','# Tweets']],data=[])),
     html.Td(html.Div(id='top-tweets',children=[]))
 
     ])])
 
     ])
 
-count = 0
 
-@app.callback([Output('tweet-data','children'),Output('top-tweets','children')],
+@app.callback([Output('tweet-data','data'),Output('top-tweets','children')],
                 [Input('submit-button','n_clicks')],
                 [State('search-term','value'),
-                State('tweet-data','children')
+                State('tweet-data','data')
                 ])
-def update_tweet_data(n_clicks,search_term,table):
-    global count
-    top_tweets = []
+def update_tweet_data(n_clicks,search_term,rows):
     if n_clicks!=0:
-        subs = [table[i]['props']['children'][1]['props']['children'] for i in range(len(table))]
         new_data = pySentiment.TweetAnalyse(search_term)
         posShare = str(round(new_data[1]*100,2)) + "%"
         negShare = str(round(new_data[2]*100,2)) + "%"
-        if search_term in subs:
-            pos = subs.index(search_term)
-            table[pos]['props']['children'][2]['props']['children'] = posShare
-            table[pos]['props']['children'][3]['props']['children'] = negShare
-            table[pos]['props']['children'][4]['props']['children'] = new_data[0]
+        if rows!=[]:
+            df = pd.DataFrame(rows,columns=['Serial No.','Subject','Positive','Negative','# Tweets'])
+            count = df['Serial No.'].iloc[-1]
+            df = df.append({'Serial No.':count+1,'Subject':search_term,'Positive':posShare,'Negative':negShare,'# Tweets':new_data[0]},ignore_index=True)
+            table = df.to_dict('records')
         else:
-            count += 1
-            table = table + [html.Tr([html.Td(x) for x in [count,search_term,posShare,negShare,new_data[0]]])]
+            table = [{'Serial No.':1,'Subject':search_term,'Positive':posShare,'Negative':negShare,'# Tweets':new_data[0]}]
         top_tweets = [html.H3('Top Tweets for '+search_term+':')] + [html.P(x['text']) for x in new_data[3]] + [html.P(x['text']) for x in new_data[4]]
-    return table,top_tweets
+        return table,top_tweets
+    else:
+        return [],[]
 
 if __name__ == '__main__':
     app.run_server()
