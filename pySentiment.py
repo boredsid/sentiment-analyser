@@ -1,3 +1,4 @@
+import os
 import re
 import tweepy
 import time
@@ -13,10 +14,10 @@ class TwitterClient(object):
 		Class constructor or initialization method.
 		'''
 		# keys and tokens from the Twitter Dev Console
-		consumer_key = 'jU6B8jHiMYQbOnknLsSUeK7lJ'
-		consumer_secret = 'Wb9D3QsLQx5BCAuiozqqppEkJPhtztgJYbBDSlWIJS8tAfujnO'
-		access_token = '771604896093044736-D8nkwRJahA1VVerfSbTBSVrcFXzvA4Y'
-		access_token_secret = '10OdwNoVmSOj3zALywzp2C3ZVzN7ZPXKi1lo8XQWLvm1N'
+		consumer_key = os.getenv('twitter_consumer_key')
+		consumer_secret = os.getenv('twitter_consumer_secret')
+		access_token = os.getenv('twitter_access_token')
+		access_token_secret = os.getenv('twitter_access_token_secret')
 
 		# attempt authentication
 		try:
